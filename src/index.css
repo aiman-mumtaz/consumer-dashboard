@@ -11,3 +11,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+@media (max-width: 576px) {
+  .smiley-container {
+    padding: 0.3rem !important;
+  }
+
+  .smiley-icon {
+    font-size: 1rem !important;
+  }
+
+  .smiley-label {
+    font-size: 0.65rem !important;
+  }
+}

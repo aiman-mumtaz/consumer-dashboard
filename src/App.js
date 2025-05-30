@@ -110,38 +110,39 @@ export default function App() {
       { icon: '🙂', label: 'Satisfied', value: 3 },
       { icon: '😃', label: 'Highly Satisfied', value: 4 },
     ];
+
     return (
-      <div className="mt-2 d-flex justify-content-around align-items-center">
+      <div className="mt-2 row g-2">
         {smileys.map((s) => (
           <div
             key={s.value}
-            className={`d-flex flex-column align-items-center p-2 rounded smiley-container ${
-              current === s.value ? 'bg-warning' : 'bg-light'
-            }`}
-            style={{
-              cursor: 'pointer',
-              width: '130px',
-              flexShrink: 0,
-              flexGrow: 0,
-              textAlign: 'center',
-              whiteSpace: 'nowrap',
-            }}
-            onClick={() => setResponses({ ...responses, [questionId]: s.value })}
+            className="col-6 col-md-3"
           >
-            <span style={{ fontSize: '1.5rem' }}>{s.icon}</span>
-            {s.label && (
-              <small
-                className="text-muted mt-1"
-                style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-              >
-                {s.label}
-              </small>
-            )}
+            <div
+              className={`d-flex flex-column align-items-center p-2 rounded smiley-container ${
+                current === s.value ? 'bg-warning' : 'bg-light'
+              }`}
+              style={{
+                cursor: 'pointer',
+                textAlign: 'center',
+                whiteSpace: 'nowrap',
+              }}
+              onClick={() => setResponses({ ...responses, [questionId]: s.value })}
+            >
+              <span className="smiley-icon" style={{ fontSize: '1.5rem' }}>{s.icon}</span>
+              {s.label && (
+                <small className="text-muted mt-1 smiley-label">
+                  {s.label}
+                </small>
+              )}
+            </div>
           </div>
         ))}
       </div>
     );
   };
+
+
 
   const renderZeroToTenRating = (questionId) => {
     const current = responses[questionId] !== undefined ? parseInt(responses[questionId]) : null;
@@ -149,9 +150,9 @@ export default function App() {
       setResponses({ ...responses, [questionId]: value });
     };
     const getColorForNumber = (num) => {
-      if (num >= 0 && num <= 6) return '#f44336'; // red
-      if (num >= 7 && num <= 8) return '#ec942c'; // yellow
-      if (num >= 9 && num <= 10) return '#4caf50'; // green
+      if (num >= 0 && num <= 6) return '#f44336';
+      if (num >= 7 && num <= 8) return '#ec942c';
+      if (num >= 9 && num <= 10) return '#4caf50';
       return '#f0f0f0';
     };
 
@@ -201,7 +202,6 @@ export default function App() {
     );
   };
 
-  
   return (
     <Container className="mt-4">
       <div className="text-center mb-4">
@@ -236,40 +236,58 @@ export default function App() {
                 }, {})
               ).map(([bucketName, bucketQuestions]) => (
                 <div key={bucketName} className="mb-4">
-                  <h5 className="fw-semibold mt-3 mb-3 text-primary">
-                    {/* <i className="bi bi-folder-fill me-2"></i> */}
-                    {bucketName}
-                  </h5>
-                  {bucketQuestions.map((q) => (
-                    <Card
-                      key={q.id}
-                      className="mb-3 shadow-sm border-0"
-                      style={{ background: '#f9f9f9' }}
-                    >
-                      <Card.Body>
-                        <Card.Title className="fw-semibold fs-6 mb-2">
-                          {q.label}
-                        </Card.Title>
-                        {q.type === 'text' ? (
-                          <Form.Control
-                            as="textarea"
-                            rows={3}
-                            placeholder="Type your response..."
-                            className="rounded-3 shadow-sm mt-2"
-                            style={{ resize: 'none' }}
-                            value={responses[q.id] || ''}
-                            onChange={(e) =>
-                              setResponses({ ...responses, [q.id]: e.target.value })
-                            }
-                          />
-                        ) : q.type === '1-4' ? (
-                          renderSmileyRating(q.id)
-                        ) : (
-                          renderZeroToTenRating(q.id)
+                  <h5 className="fw-semibold mt-3 mb-3 text-primary">{bucketName}</h5>
+                  {bucketQuestions.map((q) => {
+                    let header = null;
+                    let questionLabel = q.label;
+
+                    if (q.label.includes("How satisfied are you with L'Oréal in each of the following areas:")) {
+                      const parts = q.label.split(':');
+                      if (parts.length > 1) {
+                        header = parts[0] + ':';
+                        questionLabel = parts.slice(1).join(':').trim();
+                      }
+                    }
+
+                    return (
+                      <div key={q.id} className="mb-3">
+                        {header && (
+                          <Card className="mb-2 shadow-sm border-0" style={{ background: '#f9f9f9' }}>
+                            <Card.Body>
+                              <Card.Title className="fw-semibold fs-6 mb-2">
+                                {header}
+                              </Card.Title>
+                            </Card.Body>
+                          </Card>
                         )}
-                      </Card.Body>
-                    </Card>
-                  ))}
+                        <Card className="shadow-sm border-0" style={{ background: '#f9f9f9' }}>
+                          <Card.Body>
+                            <Card.Title className="fw-semibold fs-6 mb-2">
+                               {questionLabel.split(':')[0]} : 
+                               <span className="text-muted">{questionLabel.split(':')[1]}</span>
+                           </Card.Title>
+                            {q.type === 'text' ? (
+                              <Form.Control
+                                as="textarea"
+                                rows={3}
+                                placeholder="Type your response..."
+                                className="rounded-3 shadow-sm mt-2"
+                                style={{ resize: 'none' }}
+                                value={responses[q.id] || ''}
+                                onChange={(e) =>
+                                  setResponses({ ...responses, [q.id]: e.target.value })
+                                }
+                              />
+                            ) : q.type === '1-4' ? (
+                              renderSmileyRating(q.id)
+                            ) : (
+                              renderZeroToTenRating(q.id)
+                            )}
+                          </Card.Body>
+                        </Card>
+                      </div>
+                    );
+                  })}
                 </div>
               ))}
               <div className="text-center mt-4">
@@ -285,7 +303,6 @@ export default function App() {
             </Form>
           </Card>
         </Tab>
-
 
         <Tab eventKey="dashboard" title="Dashboard">
           <Row className="mt-4">
@@ -334,7 +351,6 @@ export default function App() {
         </Tab>
       </Tabs>
 
-      {/* Toast for response feedback */}
       <ToastContainer
         position="top-center"
         className="p-3"
@@ -356,4 +372,3 @@ export default function App() {
     </Container>
   );
 }
-
