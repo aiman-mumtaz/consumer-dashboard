@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { saveResponses, getAllResponses, saveQuestions, getQuestions } from './db';
 import {
   Container,
@@ -257,7 +257,7 @@ export default function App() {
     setResponses({});
   };
 
-  const calculateStats = async () => {
+  const calculateStats = useCallback(async () => {
     const allResponses = await getAllResponses();
     const questionStats = questions.map(q => {
       if (q.type === 'text') {
@@ -265,7 +265,6 @@ export default function App() {
       }
       const questionResponses = allResponses.filter(r => r.question === q.id);
       const scores = questionResponses.map(r => r.score);
-      // const weights = questionResponses.map(r => r.weightage);
       const count = scores.length;
       const simpleAverage = count ? scores.reduce((a, b) => a + b, 0) / count : 0;
       let weightedSum = 0;
@@ -290,13 +289,13 @@ export default function App() {
       };
     });
     setStats(questionStats);
-  };
+  }, [questions, setStats]);
 
   useEffect(() => {
     if (key === 'dashboard') {
       calculateStats();
     }
-  }, [key]);
+  }, [key, calculateStats]);
 
   return (
     <Container className="mt-4">
