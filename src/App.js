@@ -265,7 +265,7 @@ export default function App() {
       }
       const questionResponses = allResponses.filter(r => r.question === q.id);
       const scores = questionResponses.map(r => r.score);
-      const weights = questionResponses.map(r => r.weightage);
+      // const weights = questionResponses.map(r => r.weightage);
       const count = scores.length;
       const simpleAverage = count ? scores.reduce((a, b) => a + b, 0) / count : 0;
       let weightedSum = 0;
