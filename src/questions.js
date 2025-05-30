@@ -58,7 +58,7 @@ export const defaultQuestions = [
     id: 8,
     Bucket: 'Support & Communication',
     label:
-        'Communication & Responsiveness: How easy it is to contact the L\'Oréal team AND how quickly do they respond?',
+        'Communication & Responsiveness: How easy is it to contact the L\'Oréal team AND how quickly do they respond?',
     type: '1-4',
     'O/P Metric': 'Likert Scale',
     },
