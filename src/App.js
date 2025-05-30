@@ -94,7 +94,7 @@ export default function App() {
       };
     });
     setStats(questionStats);
-  }, [questions, setStats]);
+  }, [questions]);
 
   useEffect(() => {
     if (key === 'dashboard') {
@@ -105,10 +105,10 @@ export default function App() {
   const renderSmileyRating = (questionId) => {
     const current = parseInt(responses[questionId]) || 0;
     const smileys = [
-      { icon: '😞', label: 'Not satisfied at all', value: 1 },
-      { icon: '😐', label: 'Somewhat satisfied', value: 2 },
+      { icon: '😞', label: 'Highly Dissatisfied', value: 1 },
+      { icon: '😐', label: 'Dissatisfied', value: 2 },
       { icon: '🙂', label: 'Satisfied', value: 3 },
-      { icon: '😃', label: 'Very satisfied', value: 4 },
+      { icon: '😃', label: 'Highly Satisfied', value: 4 },
     ];
     return (
       <div className="mt-2 d-flex justify-content-around align-items-center">
@@ -120,11 +120,11 @@ export default function App() {
             }`}
             style={{
               cursor: 'pointer',
-              width: '130px', 
+              width: '130px',
               flexShrink: 0,
               flexGrow: 0,
               textAlign: 'center',
-              whiteSpace: 'nowrap', 
+              whiteSpace: 'nowrap',
             }}
             onClick={() => setResponses({ ...responses, [questionId]: s.value })}
           >
@@ -142,40 +142,36 @@ export default function App() {
       </div>
     );
   };
+
   const renderZeroToTenRating = (questionId) => {
-    const current = parseInt(responses[questionId]) || 0;
+    const current = responses[questionId] !== undefined ? parseInt(responses[questionId]) : null;
     const handleClick = (value) => {
       setResponses({ ...responses, [questionId]: value });
     };
     const getColorForNumber = (num) => {
-      if (num >= 1 && num <= 6) return '#f44336'; // red
-      if (num >= 7 && num <= 8) return '	#ec942c'; // yellow
+      if (num >= 0 && num <= 6) return '#f44336'; // red
+      if (num >= 7 && num <= 8) return '#ec942c'; // yellow
       if (num >= 9 && num <= 10) return '#4caf50'; // green
-      return '#f0f0f0'; // default
+      return '#f0f0f0';
     };
 
     return (
       <div className="mt-2">
-        {/* Colored Reference Bar */}
-        <div style={{ display: 'flex', marginBottom: '5px',marginTop: '5px', height: '10px' }}>
-          {Array.from({ length: 10 }, (_, i) => {
-            const num = i + 1;
-            return (
-              <div
-                key={num}
-                style={{
-                  flex: 1,
-                  backgroundColor: getColorForNumber(num),
-                  border: '1px solid white',
-                }}
-              />
-            );
-          })}
+        <div style={{ display: 'flex', marginBottom: '5px', marginTop: '5px', height: '10px' }}>
+          {Array.from({ length: 11 }, (_, i) => (
+            <div
+              key={i}
+              style={{
+                flex: 1,
+                backgroundColor: getColorForNumber(i),
+                border: '1px solid white',
+              }}
+            />
+          ))}
         </div>
 
-        {/* Numbers (1-10) */}
         <div className="d-flex justify-content-between align-items-center">
-          {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => {
+          {Array.from({ length: 11 }, (_, i) => i).map((num) => {
             const isSelected = current === num;
             const bgColor = isSelected ? getColorForNumber(num) : '#f0f0f0';
             const textColor = isSelected && num !== 7 && num !== 8 ? 'white' : 'black';
@@ -205,7 +201,7 @@ export default function App() {
     );
   };
 
-
+  
   return (
     <Container className="mt-4">
       <div className="text-center mb-4">
@@ -230,33 +226,51 @@ export default function App() {
               Please fill out the feedback form
             </h4>
             <Form>
-              {questions.map((q) => (
-                <Card
-                  key={q.id}
-                  className="mb-3 shadow-sm border-0"
-                  style={{ background: '#f9f9f9' }}
-                >
-                  <Card.Body>
-                    <Card.Title className="fw-semibold fs-6 mb-2">
-                      {q.label}
-                    </Card.Title>
-                    {q.type === 'text' ? (
-                      <Form.Control
-                        as="textarea"
-                        rows={3}
-                        placeholder="Type your response..."
-                        className="rounded-3 shadow-sm mt-2"
-                        style={{ resize: 'none' }}
-                        value={responses[q.id] || ''}
-                        onChange={e =>
-                          setResponses({ ...responses, [q.id]: e.target.value })
-                        }
-                      />
-                    ) : q.type === '1-4' ? (
-                      renderSmileyRating(q.id)
-                    ) : renderZeroToTenRating(q.id)}
-                  </Card.Body>
-                </Card>
+              {Object.entries(
+                questions.reduce((acc, question) => {
+                  if (!acc[question.Bucket]) {
+                    acc[question.Bucket] = [];
+                  }
+                  acc[question.Bucket].push(question);
+                  return acc;
+                }, {})
+              ).map(([bucketName, bucketQuestions]) => (
+                <div key={bucketName} className="mb-4">
+                  <h5 className="fw-semibold mt-3 mb-3 text-primary">
+                    {/* <i className="bi bi-folder-fill me-2"></i> */}
+                    {bucketName}
+                  </h5>
+                  {bucketQuestions.map((q) => (
+                    <Card
+                      key={q.id}
+                      className="mb-3 shadow-sm border-0"
+                      style={{ background: '#f9f9f9' }}
+                    >
+                      <Card.Body>
+                        <Card.Title className="fw-semibold fs-6 mb-2">
+                          {q.label}
+                        </Card.Title>
+                        {q.type === 'text' ? (
+                          <Form.Control
+                            as="textarea"
+                            rows={3}
+                            placeholder="Type your response..."
+                            className="rounded-3 shadow-sm mt-2"
+                            style={{ resize: 'none' }}
+                            value={responses[q.id] || ''}
+                            onChange={(e) =>
+                              setResponses({ ...responses, [q.id]: e.target.value })
+                            }
+                          />
+                        ) : q.type === '1-4' ? (
+                          renderSmileyRating(q.id)
+                        ) : (
+                          renderZeroToTenRating(q.id)
+                        )}
+                      </Card.Body>
+                    </Card>
+                  ))}
+                </div>
               ))}
               <div className="text-center mt-4">
                 <Button
@@ -303,7 +317,7 @@ export default function App() {
                     </div>
                     {stat.nps !== 'N/A' && (
                       <div className="d-flex justify-content-between align-items-center">
-                        <span>Net Projected Score</span>
+                        <span>Net Promoter Score</span>
                         <Badge
                           bg={parseFloat(stat.nps) >= 0 ? 'success' : 'danger'}
                           className="fs-6"
@@ -321,7 +335,11 @@ export default function App() {
       </Tabs>
 
       {/* Toast for response feedback */}
-      <ToastContainer position="top-center" className="p-3" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1055 }}>
+      <ToastContainer
+        position="top-center"
+        className="p-3"
+        style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1055 }}
+      >
         <Toast
           onClose={() => setShowToast(false)}
           show={showToast}
@@ -338,3 +356,4 @@ export default function App() {
     </Container>
   );
 }
+
