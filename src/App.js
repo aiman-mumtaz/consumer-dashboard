@@ -263,7 +263,7 @@ export default function App() {
                         <Card className="shadow-sm border-0" style={{ background: '#f9f9f9' }}>
                           <Card.Body>
                             <Card.Title className="fw-semibold fs-6 mb-2">
-                               {questionLabel.split(':')[0]} : 
+                               {questionLabel.split(':')[0]}{q.type === 'text' ? '' : ':'}
                                <span className="text-muted">{questionLabel.split(':')[1]}</span>
                            </Card.Title>
                             {q.type === 'text' ? (
